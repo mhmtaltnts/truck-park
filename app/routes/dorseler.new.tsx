@@ -36,7 +36,7 @@ export const action = async ({ request }: ActionArgs) => {
       );
     }
 
-    const foundDorse = prisma.dorse.findFirst({
+    const foundDorse = await prisma.dorse.findUnique({
       where: {
         plaka,
       },

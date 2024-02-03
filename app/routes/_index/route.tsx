@@ -1,5 +1,6 @@
 import type { V2_MetaFunction } from "@remix-run/node";
 import { Link } from "@remix-run/react";
+import Slider from "./slider/slider";
 import { Button } from "~/components/ui/button";
 
 import { useOptionalUser } from "~/utils";
@@ -17,28 +18,26 @@ export default function Index() {
         <nav>
           <div className="mx-auto max-w-sm sm:flex sm:max-w-none sm:justify-center">
             {user ? (
-              <Button>
-                <Link
-                  to="/dorseler"
-                  className="flex items-center justify-center rounded-md border border-transparent bg-white px-4 py-3 text-base font-medium text-blue-700 shadow-sm hover:bg-blue-50 sm:px-8"
-                >
-                  View Notes for {user.email}
-                </Link>
+              <Button variant={"default"}>
+                <Link to="/dorseler">Dorseler</Link>
               </Button>
             ) : (
               <div className="space-y-4 sm:mx-auto sm:inline-grid sm:grid-cols-2 sm:gap-5 sm:space-y-0">
-                <Button className="flex items-center justify-center rounded-md border border-transparent bg-white px-4 py-3 text-base font-medium text-blue-700 shadow-sm hover:bg-blue-50 sm:px-8">
-                  <Link to="/join">Sign up</Link>
+                <Button variant={"outline"}>
+                  <Link to="/join">Kayıt</Link>
                 </Button>
-                <Button className="flex items-center justify-center rounded-md bg-blue-500 px-4 py-3 font-medium text-white hover:bg-blue-600">
-                  <Link to="/login">Log In</Link>
+                <Button variant={"ghost"}>
+                  <Link to="/login">Giriş</Link>
                 </Button>
               </div>
             )}
           </div>
         </nav>
       </header>
-      <main className="relative min-h-screen sm:flex sm:items-center sm:justify-center"></main>
+
+      <main className="relative min-h-screen sm:flex sm:items-center sm:justify-center">
+        <Slider />
+      </main>
     </>
   );
 }

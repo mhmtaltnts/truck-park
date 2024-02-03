@@ -24,7 +24,7 @@ export const action = async ({ params, request }: ActionArgs) => {
   invariant(params.girisId, "Dorse numarası bulunamadı");
 
   if (intent === "cancel") {
-    return redirect(`/dorseler/${params.dorseId}/girisler/${params.girisId}`);
+    return redirect(`/dorseler/${params.dorseId}/girisler`);
   }
 
   if (intent === "destroy") {

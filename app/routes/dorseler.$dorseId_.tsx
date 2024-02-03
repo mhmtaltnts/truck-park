@@ -2,7 +2,6 @@ import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 
 import {
-  Link,
   Outlet,
   useLoaderData,
   isRouteErrorResponse,
@@ -28,14 +27,14 @@ export default function DorseDetailsPage() {
   const data = useLoaderData();
 
   return (
-    <div className="max-w-[450px]">
+    <div className="max-w-[1200px]">
       <h3 className="text-2xl font-bold">Dorse Bilgilerini</h3>
       <hr className="my-4" />
       <div className="flex justify-center items-center gap-2 my-3">
         <h1>Plaka: {data.dorse.plaka}</h1>
         <p>Firma: {data.dorse.firma}</p>
       </div>
-      <div className="flex gap-2">
+      {/* <div className="flex gap-2">
         <Link
           to="edit"
           className="bg-blue-600 text-white w-[80px] h-[35px] p-2 text-center rounded-md shadow-lg"
@@ -54,7 +53,7 @@ export default function DorseDetailsPage() {
         >
           Girişler
         </Link>
-      </div>
+      </div> */}
       <hr className="my-4" />
       <Outlet />
     </div>

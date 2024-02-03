@@ -1,5 +1,5 @@
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -8,8 +8,11 @@ generator client {
 }
 
 model User {
-  id    String @id @unique @default(cuid())
-  email String @unique
+  id       String @id @unique @default(cuid())
+  name     String
+  username String @unique
+  email    String @unique
+  role     String @default("user")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -20,6 +23,21 @@ model User {
   girisler  Giris[]
   cikislar  Cikis[]
   gumrukler Gumruk[]
+  image     UserImage?
+  roleId    String?
+}
+
+model UserImage {
+  id          String  @id @default(cuid())
+  altText     String?
+  contentType String
+  blob        Bytes
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String @unique
 }
 
 model Password {
@@ -30,18 +48,35 @@ model Password {
 }
 
 model Dorse {
-  id        String   @id @unique @default(uuid())
-  plaka     String   @unique
-  firma     String?
+  id         String       @id @unique @default(cuid())
+  plaka      String       @unique
+  firma      String?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  user       User         @relation(fields: [userId], references: [id], onUpdate: Cascade)
+  userId     String
+  girisler   Giris[]
+  DorseImage DorseImage[]
+}
+
+model DorseImage {
+  id          String  @id @default(cuid())
+  altText     String?
+  contentType String
+  blob        Bytes
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id], onUpdate: Cascade)
-  userId    String
-  girisler  Giris[]
+
+  dorse   Dorse  @relation(fields: [dorseId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  dorseId String
+
+  // non-unique foreign key
+  @@index([dorseId])
 }
 
 model Giris {
-  id        String   @id @unique @default(uuid())
+  id        String   @id @unique @default(cuid())
   getiren   String
   dorse     Dorse    @relation(fields: [dorseId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   dorseId   String
@@ -55,7 +90,7 @@ model Giris {
 }
 
 model Cikis {
-  id        String   @id @unique @default(uuid())
+  id        String   @id @unique @default(cuid())
   goturen   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -66,7 +101,7 @@ model Cikis {
 }
 
 model Gumruk {
-  id        String   @id @unique @default(uuid())
+  id        String   @id @unique @default(cuid())
   kayit     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

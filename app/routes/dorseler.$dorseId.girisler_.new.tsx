@@ -1,6 +1,6 @@
 import type { ActionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Form, useActionData, useParams } from "@remix-run/react";
+import { Form, useActionData } from "@remix-run/react";
 import { useEffect, useRef } from "react";
 import {
   Dialog,
@@ -11,40 +11,70 @@ import {
 import { prisma } from "~/db.server";
 import invariant from "tiny-invariant";
 import { requireUserId } from "~/session.server";
+import { Button } from "~/components/ui/button";
 
 export const action = async ({ request, params }: ActionArgs) => {
   const userId = await requireUserId(request);
   invariant(params.dorseId, "Dorse numarası bulunamadı");
-
   const formData = await request.formData();
   const getiren = formData.get("getiren");
   const yuk = formData.get("yuk");
+  const intent = formData.get("intent");
 
-  if (typeof getiren !== "string" || getiren.length === 0) {
-    return json(
-      { errors: { yuk: null, getiren: "Getiren araç plakası gerekli" } },
-      { status: 400 },
-    );
+  try {
+    if (intent === "create") {
+      if (typeof getiren !== "string" || getiren.length === 0) {
+        return json(
+          {
+            errors: {
+              yuk: null,
+              getiren: "Getiren araç plakası gerekli",
+              parkta: null,
+            },
+          },
+          { status: 400 },
+        );
+      }
+
+      if (typeof yuk !== "string" || yuk.length === 0) {
+        return json(
+          { errors: { yuk: "Yuk gerekli", getiren: null, parkta: null } },
+          { status: 400 },
+        );
+      }
+      const parkta = await prisma.giris.findFirst({
+        where: {
+          cikis: undefined,
+        },
+      });
+      if (parkta) {
+        return json(
+          {
+            errors: {
+              yuk: null,
+              getiren: null,
+              parkta: "Araç halen parktadır",
+            },
+          },
+          { status: 400 },
+        );
+      }
+      await prisma.giris.create({
+        data: { getiren, yuk, userId, dorseId: params.dorseId },
+      });
+      return redirect(`/dorseler/${params.dorseId}/girisler`);
+    }
+
+    if (intent === "cancel") {
+      return redirect(`/dorseler/${params.dorseId}/girisler`);
+    }
+  } catch (err) {
+    console.log(err);
+    return redirect(`/dorseler/${params.dorseId}/girisler`);
   }
-
-  if (typeof yuk !== "string" || yuk.length === 0) {
-    return json(
-      { errors: { yuk: "Yuk gerekli", getiren: null } },
-      { status: 400 },
-    );
-  }
-
-  const giris = await prisma.giris.create({
-    data: { getiren, yuk, userId, dorseId: params.dorseId },
-  });
-
-  console.log(giris);
-
-  return redirect(`/dorseler/${params.dorseId}`);
 };
 
 export default function NewGirisRoute() {
-  const params = useParams();
   const actionData = useActionData();
   const getirenRef = useRef<HTMLInputElement>(null);
   const yukRef = useRef<HTMLInputElement>(null);
@@ -58,7 +88,7 @@ export default function NewGirisRoute() {
   }, [actionData]);
 
   return (
-    <Dialog open={!params.new}>
+    <Dialog open={true}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Yeni Giriş Ekleme Formu</DialogTitle>
@@ -90,6 +120,11 @@ export default function NewGirisRoute() {
                 {actionData.errors.getiren}
               </div>
             ) : null}
+            {actionData?.errors?.parkta ? (
+              <div className="pt-1 text-red-700" id="plaka-error">
+                {actionData.errors.parkta}
+              </div>
+            ) : null}
           </div>
 
           <div>
@@ -101,7 +136,7 @@ export default function NewGirisRoute() {
                 className="w-full flex-1 rounded-md border-2 border-blue-500 px-3 py-2 text-lg leading-6"
                 aria-invalid={actionData?.errors?.yuk ? true : undefined}
                 aria-errormessage={
-                  actionData?.errors?.yuk ? "firma-hatası" : undefined
+                  actionData?.errors?.yuk ? "yük-hatası" : undefined
                 }
               />
             </label>
@@ -113,12 +148,22 @@ export default function NewGirisRoute() {
           </div>
 
           <div className="text-right">
-            <button
+            <Button
               type="submit"
-              className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:bg-blue-400"
+              value="cancel"
+              name="intent"
+              variant={"ghost"}
             >
-              Kaydet
-            </button>
+              İptal
+            </Button>
+            <Button
+              type="submit"
+              name="intent"
+              value="create"
+              variant="warning"
+            >
+              Giriş Yap
+            </Button>
           </div>
         </Form>
       </DialogContent>

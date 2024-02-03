@@ -37,9 +37,9 @@ export const action = async ({ request, params }: ActionArgs) => {
       },
     });
 
-    return redirect(`/dorseler/${params.dorseId}/girisler/${params.girisId}`);
+    return redirect(`/dorseler/${params.dorseId}/girisler`);
   } else {
-    return redirect(`/dorseler/${params.dorseId}/girisler/${params.girisId}`);
+    return redirect(`/dorseler/${params.dorseId}/girisler`);
   }
 };
 

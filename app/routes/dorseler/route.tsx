@@ -18,6 +18,7 @@ import { Label } from "~/components/ui/label";
 import { getDorseList } from "~/models/dorse.server";
 //import { requireUserId } from "~/session.server";
 import { useUser } from "~/utils";
+import { DorseCard } from "./dorse-card";
 
 export const loader = async ({ request }: LoaderArgs) => {
   //const userId = await requireUserId(request);
@@ -94,9 +95,9 @@ export default function DorsesPage() {
         </Form>
       </header>
 
-      <main className="flex flex-row w- full justify-start items-start bg-white">
+      <main className="flex flex-row w-full justify-start items-start bg-white">
         <div className="flex flex-col items-center justify-start">
-          <div className="flex justify-start items-center">
+          <div className="flex justify-start items-center w-full">
             <Form id="search-form" role="search">
               <div className="flex justify-center group cursor-pointer border-2 rounded-lg hover:border-blue-900 items-center py-2 px-3 m-2 gap-2">
                 <Label htmlFor="q">
@@ -126,7 +127,7 @@ export default function DorsesPage() {
             </Form>
             <Link to="new">Yeni</Link>
           </div>
-          <div className="w-80 border-r bg-gray-50 overflow-scroll">
+          <div className="w-120 border-r bg-gray-50 overflow-scroll">
             {dorseFiltered.length === 0 ? (
               <p className="p-4">Henüz kayıtlı dorse yok</p>
             ) : (
@@ -141,7 +142,13 @@ export default function DorsesPage() {
                       }
                       to={dorse.id}
                     >
-                      📝 {dorse.plaka}
+                      <DorseCard
+                        role={user.role}
+                        id={dorse.id}
+                        plaka={dorse.plaka}
+                        firma={dorse.firma}
+                        createdAt={dorse.createdAt}
+                      />
                     </NavLink>
                   </li>
                 ))}
