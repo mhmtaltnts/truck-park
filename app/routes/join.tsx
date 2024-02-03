@@ -15,25 +15,25 @@ export const loader = async ({ request }: LoaderArgs) => {
 
 export const action = async ({ request }: ActionArgs) => {
   const formData = await request.formData();
-  const fullName = formData.get("fullName");
+  const name = formData.get("name");
   const email = formData.get("email");
   const password = formData.get("password");
   const redirectTo = safeRedirect(formData.get("redirectTo"), "/");
 
   if (!validateEmail(email)) {
     return json(
-      { errors: { email: "Email is invalid", password: null, fullName: null } },
+      { errors: { email: "Email is invalid", password: null, name: null } },
       { status: 400 },
     );
   }
 
-  if (typeof fullName !== "string" || fullName.length === 0) {
+  if (typeof name !== "string" || name.length === 0) {
     return json(
       {
         errors: {
           email: null,
           password: null,
-          fullName: "Adınızı ve Soyadınızı yazınız",
+          name: "Adınızı ve Soyadınızı yazınız",
         },
       },
       { status: 400 },
@@ -46,7 +46,7 @@ export const action = async ({ request }: ActionArgs) => {
         errors: {
           email: null,
           password: "Password is required",
-          fullName: null,
+          name: null,
         },
       },
       { status: 400 },
@@ -59,7 +59,7 @@ export const action = async ({ request }: ActionArgs) => {
         errors: {
           email: null,
           password: "Password is too short",
-          fullName: null,
+          name: null,
         },
       },
       { status: 400 },
@@ -73,14 +73,14 @@ export const action = async ({ request }: ActionArgs) => {
         errors: {
           email: "A user already exists with this email",
           password: null,
-          fullName: null,
+          name: null,
         },
       },
       { status: 400 },
     );
   }
 
-  const user = await createUser(fullName, email, password);
+  const user = await createUser(name, email, password);
 
   return createUserSession({
     redirectTo,
@@ -96,13 +96,13 @@ export default function Join() {
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("redirectTo") ?? undefined;
   const actionData = useActionData<typeof action>();
-  const fullNameRef = useRef<HTMLInputElement>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (actionData?.errors?.fullName) {
-      fullNameRef.current?.focus();
+    if (actionData?.errors?.name) {
+      nameRef.current?.focus();
     } else if (actionData?.errors?.email) {
       emailRef.current?.focus();
     } else if (actionData?.errors?.password) {
@@ -111,31 +111,31 @@ export default function Join() {
   }, [actionData]);
 
   return (
-    <div className="flex min-h-full flex-col justify-center">
+    <div className="flex h-screen flex-col justify-center">
       <div className="mx-auto w-full max-w-md px-8">
         <Form method="post" className="space-y-6">
           <div>
             <label
-              htmlFor="fullName"
+              htmlFor="name"
               className="block text-sm font-medium text-gray-700"
             >
               Adınız ve Soyadınız
             </label>
             <div className="mt-1">
               <input
-                ref={fullNameRef}
-                id="fullName"
+                ref={nameRef}
+                id="name"
                 required
                 autoFocus={true}
-                name="fullName"
+                name="name"
                 type="text"
-                aria-invalid={actionData?.errors?.fullName ? true : undefined}
-                aria-describedby="fullName-error"
+                aria-invalid={actionData?.errors?.name ? true : undefined}
+                aria-describedby="name-error"
                 className="w-full rounded border border-gray-500 px-2 py-1 text-lg"
               />
-              {actionData?.errors?.fullName ? (
-                <div className="pt-1 text-red-700" id="fullName-error">
-                  {actionData.errors.fullName}
+              {actionData?.errors?.name ? (
+                <div className="pt-1 text-red-700" id="name-error">
+                  {actionData.errors.name}
                 </div>
               ) : null}
             </div>

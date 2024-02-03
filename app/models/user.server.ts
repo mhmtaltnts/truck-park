@@ -14,7 +14,7 @@ export async function getUserByEmail(email: User["email"]) {
 }
 
 export async function createUser(
-  fullName: User["fullName"],
+  name: User["name"],
   email: User["email"],
   password: string,
 ) {
@@ -22,7 +22,7 @@ export async function createUser(
 
   return prisma.user.create({
     data: {
-      fullName,
+      name,
       email,
       password: {
         create: {

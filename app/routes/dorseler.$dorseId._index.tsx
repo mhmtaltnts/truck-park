@@ -58,8 +58,8 @@ export function DorseIndexRoute() {
               <Input id="name" defaultValue="Pedro Duarte" />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="username">Username</Label>
-              <Input id="username" defaultValue="@peduarte" />
+              <Label htmlFor="email">Kullanıcı Eposta</Label>
+              <Input id="email" defaultValue="@peduarte" />
             </div>
           </CardContent>
           <CardFooter>
